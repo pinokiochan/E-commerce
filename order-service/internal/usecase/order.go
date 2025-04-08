@@ -6,16 +6,17 @@ import (
 )
 
 type Order struct {
-	orderRepo OrderUsecase
+	orderRepo OrderRepository
 }
 
-func NewOrder(orderRepo OrderUsecase) *Order {
+func NewOrder(orderRepo OrderRepository) *Order {
 	return &Order{
 		orderRepo: orderRepo,
 	}
 }
 
 func (u *Order) Create(ctx context.Context, request models.Order) (models.Order, error) {
+	// fmt.Println(request.OrderItems[0].Quantity)
 	orderID, err := u.orderRepo.CreateOrder(ctx, request)
 	if err != nil {
 		return models.Order{}, err
@@ -56,8 +57,4 @@ func (u *Order) SetStatus(ctx context.Context, request models.UpdateStatus) (mod
 	order.Status = request.Status
 
 	return order, nil
-}
-
-func (u *Order) Delete(ctx context.Context, id int64) error {
-	return u.orderRepo.DeleteOrder(ctx, id)
 }
