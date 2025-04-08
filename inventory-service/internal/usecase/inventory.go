@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"api-gateway/internal/models"
+	"inventory-service/internal/models"
 	"context"
 )
 

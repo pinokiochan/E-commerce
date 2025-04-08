@@ -9,7 +9,7 @@ type Inventory struct {
 	Price       float64
 	Available   int64
 	CreatedAt   time.Time
-	Version     int
+	Version     int32
 	IsDeleted   bool
 }
 
@@ -20,6 +20,6 @@ type UpdateInventoryData struct {
 	Price       *float64
 	Available   *int64
 	CreatedAt   *time.Time
-	Version     *int
+	Version     *int32
 	IsDeleted   *bool
 }

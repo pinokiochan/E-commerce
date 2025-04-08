@@ -1,7 +1,7 @@
 package models
 
 import (
-	"api-gateway/pkg/validator"
+	"inventory-service/pkg/validator"
 	"slices"
 	"strings"
 )
