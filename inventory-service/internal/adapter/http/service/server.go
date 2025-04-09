@@ -1,10 +1,10 @@
 package service
 
 import (
-	"inventory-service/config"
-	"inventory-service/internal/adapter/http/service/handlers"
 	"errors"
 	"fmt"
+	"inventory-service/config"
+	"inventory-service/internal/adapter/http/service/handlers"
 	"log"
 	"net/http"
 
@@ -52,8 +52,8 @@ func (a *API) setupRoutes() {
 	products := a.server.Group("/products")
 	{
 		products.POST("/", a.inventoryHandler.Create)
-		products.GET("/", a.inventoryHandler.Get)
-		products.GET("/:id", a.inventoryHandler.GetListInventory)
+		products.GET("/", a.inventoryHandler.GetList)
+		products.GET("/:id", a.inventoryHandler.GetByID)
 		products.PATCH("/:id", a.inventoryHandler.Update)
 		products.DELETE("/:id", a.inventoryHandler.Delete)
 	}
