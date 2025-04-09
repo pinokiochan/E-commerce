@@ -17,7 +17,7 @@ func NewInventoryRepository(db *pgxpool.Pool) *InventoryRepository {
 	return &InventoryRepository{db: db}
 }
 
-func (p *InventoryRepository) Create(ctx context.Context, item models.Inventory) (int64, error) {
+func (p *InventoryRepository) CreateItem(ctx context.Context, item models.Inventory) (int64, error) {
 	query := `
 		INSERT INTO inventory (name, description, price, available)
 		VALUES ($1, $2, $3, $4)
@@ -47,13 +47,14 @@ func (p *InventoryRepository) Get(ctx context.Context, id int64) (models.Invento
 	`
 	var item models.Inventory
 	err := p.db.QueryRow(ctx, query, id).Scan(
-		item.ID,
-		item.CreatedAt,
-		item.Name,
-		item.Description,
-		item.Price,
-		item.Version,
-		item.IsDeleted,
+		&item.ID,
+		&item.CreatedAt,
+		&item.Name,
+		&item.Description,
+		&item.Price,
+		&item.Available,
+		&item.IsDeleted,
+		&item.Version,
 	)
 	if err != nil {
 		return models.Inventory{}, err
@@ -107,7 +108,7 @@ func (p *InventoryRepository) GetListInventory(ctx context.Context, filters mode
 
 }
 
-func (p *InventoryRepository) Update(ctx context.Context, item models.Inventory) error {
+func (p *InventoryRepository) Update(ctx context.Context, item *models.Inventory) error {
 	query := `
 		UPDATE inventory
 		SET name = $1, description = $2, price = $3, available = $4, version = version + 1
