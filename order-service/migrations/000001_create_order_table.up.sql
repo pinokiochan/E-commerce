@@ -14,3 +14,5 @@ CREATE TABLE IF NOT EXISTS order_items (
     PRIMARY KEY (orderID, productID),
     FOREIGN KEY (orderID) REFERENCES orders(id) ON DELETE CASCADE
 );
+
+

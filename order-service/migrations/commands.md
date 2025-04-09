@@ -52,4 +52,4 @@ migrate -path=./migrations -database "postgres://user:password@localhost:5432/db
 migrate -path=./migrations -database "postgres://user:password@localhost:5432/dbname?sslmode=disable" up 2
 ```
 
-psql --host=localhost --dbname=orderservice --username=postgres
+psql --host=localhost --dbname=orderservice --username=temut
