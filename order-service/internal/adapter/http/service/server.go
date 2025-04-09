@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"order-service/config"
-	"order-service/internal/adapter/http/service/handler"
+	"order-service/internal/adapter/http/service/handlers"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,7 +24,7 @@ type API struct {
 	cfg    config.HTTPServer
 	addr   string
 
-	orderHandler *handler.Order
+	orderHandler *handlers.Order
 }
 
 func New(cfg config.Server, orderUsecase OrderUsecase) *API {
@@ -37,8 +37,8 @@ func New(cfg config.Server, orderUsecase OrderUsecase) *API {
 	server.Use(gin.Logger())
 	server.Use(gin.Recovery())
 
-	// Binding clients
-	orderHandler := handler.NewOrder(orderUsecase)
+	// Binding orders
+	orderHandler := handlers.NewOrder(orderUsecase)
 
 	api := &API{
 		server:       server,
@@ -55,12 +55,12 @@ func New(cfg config.Server, orderUsecase OrderUsecase) *API {
 func (a *API) setupRoutes() {
 	a.server.GET("/healthcheck", a.HealthCheck)
 
-	clients := a.server.Group("/orders")
+	orders := a.server.Group("/orders")
 	{
-		clients.POST("/", a.orderHandler.Create)
-		clients.GET("/", a.orderHandler.GetList)
-		clients.GET("/:id", a.orderHandler.GetByID)
-		clients.PATCH("/:id", a.orderHandler.SetStatus)
+		orders.POST("/", a.orderHandler.Create)
+		orders.GET("/", a.orderHandler.GetList)
+		orders.GET("/:id", a.orderHandler.GetByID)
+		orders.PATCH("/:id", a.orderHandler.SetStatus)
 	}
 }
 

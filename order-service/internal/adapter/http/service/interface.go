@@ -1,7 +1,7 @@
 package service
 
-import "order-service/internal/adapter/http/service/handler"
+import "order-service/internal/adapter/http/service/handlers"
 
 type OrderUsecase interface {
-	handler.OrderUsecase
+	handlers.OrderUsecase
 }
