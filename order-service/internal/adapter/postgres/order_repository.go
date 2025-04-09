@@ -16,41 +16,45 @@ type Order struct {
 func NewOrderRepository(db *pgxpool.Pool) *Order {
 	return &Order{db: db}
 }
-// CreateOrder implements usecase.OrderRepository.
 
-func (r *Order) CreateOrder(ctx context.Context, order models.Order) (int64, error) {
+func (r *Order) Create(ctx context.Context, order models.Order) (int64, error) {
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
 		return 0, err
 	}
 	defer tx.Rollback(ctx)
+
 	query := `
-			INSERT INTO orders (customername, status)
-			VALUES ($1, $2)
-			RETURNING ID;
+		INSERT INTO orders (customername, status) 
+		VALUES ($1, $2)
+		RETURNING ID;
 	`
+
 	var orderID int64
 	err = tx.QueryRow(ctx, query, order.CustomerName, order.Status).Scan(&orderID)
 	if err != nil {
 		return 0, err
 	}
+
+	// Inserting order items. in case when same product id is given, it check on conflict, if so it's just adding quantity for previus row.
 	queryOrderItems := `
-				INSERT INTO order_items (OrderID, ProductID, Quantity) VALUES
-				($1, $2, $3)
-				ON CONFLICT (OrderID, ProductID)
-				DO UPDATE SET Quantity = order_items.Quantity + EXCLUDED.Quantity
+		INSERT INTO order_items (OrderID, ProductID, Quantity) VALUES
+		($1, $2, $3)
+		ON CONFLICT (OrderID, ProductID)
+		DO UPDATE SET Quantity = order_items.Quantity + EXCLUDED.Quantity;
 	`
+
 	for _, v := range order.OrderItems {
 		_, err = tx.Exec(ctx, queryOrderItems, orderID, v.ProductID, v.Quantity)
 		if err != nil {
 			return 0, err
 		}
-
 	}
-	return orderID, tx.Commit(ctx)
 
+	return orderID, tx.Commit(ctx)
 }
-func (r *Order) GetByFilter(ctx context.Context, filter models.OrderFilter) (models.Order, error) {
+
+func (r *Order) GetWithFilter(ctx context.Context, filter models.OrderFilter) (models.Order, error) {
 	query := `
 		SELECT id, customername, status, created_at 
 		FROM orders 
@@ -62,7 +66,7 @@ func (r *Order) GetByFilter(ctx context.Context, filter models.OrderFilter) (mod
 		&order.ID,
 		&order.CustomerName,
 		&order.Status,
-		&order.CreatedAt,
+		&order.Created_at,
 	)
 	if err != nil {
 		return models.Order{}, err
@@ -99,7 +103,7 @@ func (r *Order) GetByFilter(ctx context.Context, filter models.OrderFilter) (mod
 	return order, nil
 }
 
-func (r *Order) GetListOrderByFilter(ctx context.Context, filter models.OrderFilter) ([]models.Order, error) {
+func (r *Order) GetListWithFilter(ctx context.Context, filter models.OrderFilter) ([]models.Order, error) {
 	// First, get all orders
 	ordersQuery := `
         SELECT id, customername, status, created_at 
@@ -117,7 +121,7 @@ func (r *Order) GetListOrderByFilter(ctx context.Context, filter models.OrderFil
 	var orders []models.Order
 	for rows.Next() {
 		var order models.Order
-		err := rows.Scan(&order.ID, &order.CustomerName, &order.Status, &order.CreatedAt)
+		err := rows.Scan(&order.ID, &order.CustomerName, &order.Status, &order.Created_at)
 		if err != nil {
 			return nil, err
 		}
@@ -179,7 +183,7 @@ func (r *Order) GetListOrderByFilter(ctx context.Context, filter models.OrderFil
 	return orders, nil
 }
 
-func (r *Order) UpdateOrder(ctx context.Context, update models.OrderUpdateData) error {
+func (r *Order) Update(ctx context.Context, update models.OrderUpdateData) error {
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
 		return err
