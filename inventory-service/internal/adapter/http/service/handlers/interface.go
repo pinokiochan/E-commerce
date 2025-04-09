@@ -1,14 +1,15 @@
 package handlers
 
 import (
-	"inventory-service/internal/models"
 	"context"
+	"inventory-service/internal/adapter/http/service/handlers/dto"
+	"inventory-service/internal/models"
 )
 
 type InventoryUsecase interface {
-	CreateItem(ctx context.Context, item models.Inventory) (int64, error)
+	CreateItem(ctx context.Context, request models.Inventory) (models.Inventory, error)
 	Get(ctx context.Context, id int64) (models.Inventory, error)
-	GetListInventory(ctx context.Context, filters models.Filters) ([]models.Inventory, error)
-	Update(ctx context.Context, item models.Inventory) error
+	GetListInventory(ctx context.Context, filters models.Filters) ([]models.Inventory, dto.Metadata, error)
+	Update(ctx context.Context, request models.UpdateInventoryData) (models.Inventory, error)
 	Delete(ctx context.Context, id int64) error
 }
