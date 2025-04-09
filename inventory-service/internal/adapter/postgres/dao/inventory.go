@@ -7,7 +7,7 @@ import (
 
 var ErrRecordNotFound = errors.New("record not found")
 
-type Product struct {
+type Product struct { 
 	ID          int64
 	CreatedAt   time.Time
 	Name        string
